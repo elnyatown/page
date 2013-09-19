@@ -40,6 +40,7 @@ function generateTIME(){return date("H:i:s");}//ЗАВЕРШЕНО
 
 function initModules($input){
 	$this->initModules["tpl"] = new etcTemplate(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
+	//$this->initModules["fileTpl"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
 	$this->initModules["tpl"]->parse('tpl.MODULES');
 	$this->initModules["stringListModules"]=$this->initModules["tpl"]->text('tpl.MODULES');
 	$this->initModules["arrayListModules"]=preg_split("/,/",$this->initModules["stringListModules"],-1);//создаем массив модулей из списка
@@ -162,6 +163,30 @@ function getModulesContent($input){//функция выборки модуле�
 return $this->getMC["output"];
 unset($this->getMC["output"]);
 }
+function getListModules($input){//функция выборки модулей из контента (возвращает список модулей )
+//В функцию передаем content, startTag, endTag
+//Возвращает arrayListModules или strListModules
+	$this->getLM["input"]=$input;
+	$this->getLM["input"]["startTag"]="{mod_";
+	$this->getLM["input"]["endTag"]="}";
+	$this->getLM["startString"] = explode($this->getLM["input"]["startTag"], $this->getLM["input"]["content"]);
+	unset($this->getLM["startString"][0]);//если до модуля есть текст, то просто его удаляем из обработки
+	if (isset($this->getLM["startString"][1])){//если найден хоть один модуль
+		foreach($this->getLM["startString"] as $this->getLM["startString"]["key"]=>$this->getLM["startString"]["value"]){
+			$this->getLM["endString"][] = explode($this->getLM["input"]["endTag"], $this->getLM["startString"][$this->getLM["startString"]["key"]]);
+		}
+		foreach($this->getLM["endString"] as $this->getLM["endString"]["key"]=>$this->getLM["endString"]["value"]){
+			//массив с именами модулей
+			$this->getLM["output"]["arrayListModules"][]="mod_".$this->getLM["endString"]["value"][0];
+		}
+	}
+
+	//нужна проверка, если нет подключенных модулей (массив пустой), то не запускать initMC()
+return $this->getMC["output"];
+unset($this->getMC["output"]);
+}
+
+
 	
 //echo	GetBetween("QQQ{mod_1111}}wuret}{mod_TESTMOD}sk{}jlf{mod_TEST2}dgd}fgh{mod_LAST}","{mod_","}");
 

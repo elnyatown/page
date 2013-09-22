@@ -1,11 +1,11 @@
 <?php
 
-define('DOCUMENT_ROOT',				$_SERVER["DOCUMENT_ROOT"]);
+ define('DOCUMENT_ROOT',				$_SERVER["DOCUMENT_ROOT"]);
 define('TEMP',						$_SERVER["DOCUMENT_ROOT"]."/temp/");
 define('THEME',						'default');
 define('MODULES',					$_SERVER["DOCUMENT_ROOT"]."/modules/");
 define('LINES_IN_PAGE',				2);//количество записей на странице
-define('LENGHT_LINK_PAGES',			2);//количество ссылок в любую сторону от выбранной страницы
+define('LENGHT_LINK_PAGES',			2);//количество ссылок в любую сторону от выбранной страницы 
 
 
 
@@ -16,7 +16,7 @@ class Kernel{
 //
 
 
-function __construct(){//ЗАВЕРШЕНО
+/* function __construct(){//ЗАВЕРШЕНО
 	$this->DOCUMENT_ROOT='DOCUMENT_ROOT';
 	$this->hostName = "localhost"; 
 	$this->userName = "u3277619_default"; 
@@ -27,9 +27,9 @@ function __construct(){//ЗАВЕРШЕНО
 	//mysql_query("SET NAME utf8");
 	mysql_query("SET character_set_client='utf8'");
 	mysql_query("SET character_set_results='utf8'");
-	mysql_query("SET collation_connection='utf8_general_ci' ");
+	mysql_query("SET collation_connection='utf8_general_ci' "); 
 }
-
+*/
 function generateXesh(){return md5(microtime());}//ЗАВЕРШЕНО
 function generateTIMESTAMP(){return time();}//ЗАВЕРШЕНО
 function generateDATE(){return date("d:m:Y");}//ЗАВЕРШЕНО
@@ -163,27 +163,46 @@ function getModulesContent($input){//функция выборки модуле�
 return $this->getMC["output"];
 unset($this->getMC["output"]);
 }
+
+
 function getListModules($input){//функция выборки модулей из контента (возвращает список модулей )
-//В функцию передаем content, startTag, endTag
-//Возвращает arrayListModules или strListModules
+//В функцию передаем html, startTag, endTag
+//{mod_menu:var1=test1,var2=test2}
+//{mod_menu}
+//Возвращает arrayListModules, Modules[имяМодуля][параметр]=значение
 	$this->getLM["input"]=$input;
 	$this->getLM["input"]["startTag"]="{mod_";
 	$this->getLM["input"]["endTag"]="}";
-	$this->getLM["startString"] = explode($this->getLM["input"]["startTag"], $this->getLM["input"]["content"]);
+	$this->getLM["startString"] = explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
 	unset($this->getLM["startString"][0]);//если до модуля есть текст, то просто его удаляем из обработки
 	if (isset($this->getLM["startString"][1])){//если найден хоть один модуль
 		foreach($this->getLM["startString"] as $this->getLM["startString"]["key"]=>$this->getLM["startString"]["value"]){
 			$this->getLM["endString"][] = explode($this->getLM["input"]["endTag"], $this->getLM["startString"][$this->getLM["startString"]["key"]]);
 		}
 		foreach($this->getLM["endString"] as $this->getLM["endString"]["key"]=>$this->getLM["endString"]["value"]){
+			//разбиваем чтобы найти параметры
+			$this->getLM["tempStr"]=explode(':',$this->getLM["endString"]["value"][0]);
+			$this->getLM["tempName"]=$this->getLM["tempStr"][0];//имя модуля берем мез префикса mod_
+			//$this->getLM["Modules"][$this->getLM["tempName"]]["modName"]=$this->getLM["tempName"];
+			if(isset($this->getLM["tempStr"][1])){
+				$this->getLM["strParameters"]=explode(',',$this->getLM["tempStr"][1]);
+				foreach($this->getLM["strParameters"] as $this->getLM["strParameters"]["key"]=>$this->getLM["strParameters"]["value"]){
+					$this->getLM["parameter"]=explode('=',$this->getLM["strParameters"][$this->getLM["strParameters"]["key"]]);
+					$this->getLM["Modules"][$this->getLM["tempName"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
+					//$this->getLM["Modules"][имяМодуля][имяПараметра]=значениеПараметра, зарезервированное имя параметра - modName
+				}
+			}
 			//массив с именами модулей
-			$this->getLM["output"]["arrayListModules"][]="mod_".$this->getLM["endString"]["value"][0];
+			$this->getLM["output"]["arrayListModules"][]="mod_".$this->getLM["tempName"];
 		}
+		$this->getLM["output"]["Modules"]=$this->getLM["Modules"];
+	}else{
+		//нужна проверка, если нет подключенных модулей (массив пустой), то не запускать initMC()
+		$this->getLM["output"]["arrayListModules"]="empty";
+		$this->getLM["output"]["Modules"]="empty";
 	}
-
-	//нужна проверка, если нет подключенных модулей (массив пустой), то не запускать initMC()
-return $this->getMC["output"];
-unset($this->getMC["output"]);
+return $this->getLM["output"];
+unset($this->getLM["output"]);
 }
 
 

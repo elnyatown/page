@@ -16,12 +16,60 @@
  <body>
 
 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
 
   <div class="container">
+<div class="row">
+  <div class="navbar navbar-static-top ">
+ <ul class="nav">
+  <li class="active">
+    <a href="#">Домой</a>
+  </li>
+  <li class="divider-vertical"></li>
+  <li><a href="#">Link</a></li>
+  <li class="divider-vertical"></li>
+  <li><a href="#">Link</a></li>
+</ul>
+</div>
 
+</div>
+  
+  
  <div class="row">
-  <div class="span6">.xcvbx 88888 88888 8888 8888 cvb..</div>
+  <div class="span6">.xcvbx 88888 88888 8888 8888 cvb. kujhg k hlkhfdl hvk lkhwe kejh ljwerlkjehr jkerh lkjke hvkljehkljvh jhwer lkewhjk hlkjhwe v.</div>
   <div class="span4 offset2">.
   
   <form class="form-horizontal">
@@ -46,17 +94,29 @@
     </div>
   </div>
 </form>
-  
-  
-  
-  
-  
-  
-  
-  .xcv44 444 444444 44444 4444 444b xcvb.</div>
+</div>
 </div>
 	
-	
+<div class="row">
+  <div class="span12">
+  
+  <div class="dropdown">
+<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Dropdown trigger</a>
+  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+  <li><a tabindex="-1" href="#">Действие</a></li>
+  <li><a tabindex="-1" href="#">Другое действие</a></li>
+  <li><a tabindex="-1" href="#"></a></li>
+  <li class="divider"></li>
+  <li><a tabindex="-1" href="#">Отделенный пункт</a></li>
+</ul>
+</div>
+  </div>
+  
+  
+
+
+  
+</div>
 	
 	
 	

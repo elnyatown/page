@@ -1,12 +1,12 @@
 <?php
 
- define('DOCUMENT_ROOT',				$_SERVER["DOCUMENT_ROOT"]);
+define('DOCUMENT_ROOT',				$_SERVER["DOCUMENT_ROOT"]);
 define('TEMP',						$_SERVER["DOCUMENT_ROOT"]."/temp/");
 define('THEME',						'default');
 define('MODULES',					$_SERVER["DOCUMENT_ROOT"]."/modules/");
 define('LINES_IN_PAGE',				2);//количество записей на странице
-define('LENGHT_LINK_PAGES',			2);//количество ссылок в любую сторону от выбранной страницы 
-
+define('LENGHT_LINK_PAGES',			2);//количество ссылок в любую сторону от выбранной страницы
+define('URL',						"http://page.elnyatown.ru");
 
 
 
@@ -16,20 +16,20 @@ class Kernel{
 //
 
 
-/* function __construct(){//ЗАВЕРШЕНО
+function __construct(){//ЗАВЕРШЕНО
 	$this->DOCUMENT_ROOT='DOCUMENT_ROOT';
 	$this->hostName = "localhost"; 
-	$this->userName = "u3277619_default"; 
+	$this->userName = "cms"; 
 	$this->password = "opendoor"; 
-	$this->dbName = "u3277619_default";
+	$this->dbName = "cms";
 	$this->connect=mysql_connect($this->hostName,$this->userName,$this->password) OR DIE("Не могу создать соединение ");
 	mysql_select_db($this->dbName) or die(mysql_error());
 	//mysql_query("SET NAME utf8");
 	mysql_query("SET character_set_client='utf8'");
 	mysql_query("SET character_set_results='utf8'");
-	mysql_query("SET collation_connection='utf8_general_ci' "); 
+	mysql_query("SET collation_connection='utf8_general_ci' ");
 }
-*/
+
 function generateXesh(){return md5(microtime());}//ЗАВЕРШЕНО
 function generateTIMESTAMP(){return time();}//ЗАВЕРШЕНО
 function generateDATE(){return date("d:m:Y");}//ЗАВЕРШЕНО
@@ -40,16 +40,18 @@ function generateTIME(){return date("H:i:s");}//ЗАВЕРШЕНО
 
 function initModules($input){
 	$this->initModules["tpl"] = new etcTemplate(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
-	//$this->initModules["fileTpl"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
-	$this->initModules["tpl"]->parse('tpl.MODULES');
-	$this->initModules["stringListModules"]=$this->initModules["tpl"]->text('tpl.MODULES');
-	$this->initModules["arrayListModules"]=preg_split("/,/",$this->initModules["stringListModules"],-1);//создаем массив модулей из списка
-	foreach($this->initModules["arrayListModules"] as $this->initModules["name"]){
-		$this->initModules["name"]=trim($this->initModules["name"]);
-		include_once(DOCUMENT_ROOT."/modules/".$this->initModules["name"]."/".$this->initModules["name"].".php");//подключаем исполняемый файл модуля
-		$callback=$this->initModules["name"];
+	
+	$this->initModules["getListModules"]["html"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
+	
+	$this->initModules["out"]["getListModules"]=$this->getListModules($this->initModules["getListModules"]);
+
+	foreach($this->initModules["out"]["getListModules"]["arrayListModules"] as $this->initModules["nameModule"]){
+		$this->initModules["nameModule"]=trim($this->initModules["nameModule"]);
+		include_once(DOCUMENT_ROOT."/modules/".$this->initModules["nameModule"]."/".$this->initModules["nameModule"].".php");//подключаем исполняемый файл модуля
+		$callback=$this->initModules["nameModule"];
 		//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
-		$this->initModules["assign"][$this->initModules["name"]]=$callback($input[$this->initModules["name"]]); 
+		$this->initModules["assign"][$this->initModules["nameModule"]]=$callback($input[$this->initModules["nameModule"]]); 
+ 
 	}
 return $this->initModules["assign"];
 }
@@ -66,15 +68,15 @@ function initModulesContent($input){
 	if(count($this->initMC["input"]["listModules"])!=0){
 		if($this->initMC["tmpFile"]){//если запись файла прошла успешно
 			//инициализируем модули
-			foreach($this->initMC["input"]["listModules"] as $this->initMC["name"]){
+			foreach($this->initMC["input"]["arrayListModules"] as $this->initMC["name"]){
 				$this->initMC["name"]=trim($this->initMC["name"]);
 				include_once(DOCUMENT_ROOT."/modules/".$this->initMC["name"]."/".$this->initMC["name"].".php");//подключаем исполняемый файл модуля
 				$callback=$this->initMC["name"];
 				//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
-				$this->initMC["assign"][$this->initMC["name"]]=$callback(); //параметры в функцию не передаем, так как пока не можем их вписать в котент
+				$this->initMC["assign"][$this->initMC["name"]]=$callback(); //параметры модуля в функцию не передаем, так как пока не можем их вписать в котент
 			}
 		}else{//если запись в файл прошла неуспешно, то надо по шаблонам вывести стандартное предупреждение
-			foreach($this->initMC["input"]["listModules"] as $this->initMC["name"]){
+			foreach($this->initMC["input"]["arrayListModules"] as $this->initMC["name"]){
 				$this->initMC["name"]=trim($this->initMC["name"]);
 				//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
 				$this->initMC["assign"][$this->initMC["name"]]="ОШИБКА ПРИ СОЗДАНИИ ВРЕМЕННОГО ФАЙЛА ШАБЛОНА"; //параметры в функцию не передаем, так как пока не можем их вписать в котент
@@ -92,76 +94,6 @@ function initModulesContent($input){
 	unlink(TEMP.$this->initMC["timestamp"].'.tmp');
 //возвращаем измененный контент
 return $this->initMC["output"];
-}
-
-function parseURL($input){
-	$this->parseURL["input"]=$input;
-	$this->parseURL["str"]= explode("/", $this->parseURL["input"]["REQUEST_URI"]);
-	$this->parseURL["url"]["url_alt"]=substr(end($this->parseURL["str"]),0,strrpos(end($this->parseURL["str"]),"."));
-return $this->parseURL["url"];
-}
-
-function convertURL($input){
-	$this->convertURL["input"]=$input;
-	//если url_alt пустой то выводим главную страницу
-	$this->query="SELECT * FROM urls WHERE url_alt='{$this->convertURL["input"]["url_alt"]}'";
-	$this->sql=mysql_query($this->query) or die(mysql_error());
-	$this->convertURL["row"]=mysql_fetch_array($this->sql);
-return $this->convertURL["row"];
-}
-
-
-function getModulesSetting($input){
-$this->gMS["input"]=$input;
-$this->gMS["tpl"] = new etcTemplate(MODULES.$this->gMS["input"]["modName"]."/".$this->gMS["input"]["modName"].'.template.tpl');
-	
-	$this->gMS["tpl"]->parse("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
-	$this->gMS["vars"]["varValue"]=$this->gMS["tpl"]->text("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
-	$this->gMS["tpl"]->reset("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
-
-return $this->gMS["vars"]["varValue"];
-unset($this->gMS);
-}
-
-function getModulesError($input){
-$this->getME["input"]=$input;
-$this->getME["tpl"] = new etcTemplate(MODULES.$this->getME["input"]["modName"]."/".$this->getME["input"]["modName"].'.template.tpl');
-
-	$this->getME["tpl"]->parse("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
-	$this->getME["errors"]["error"]=$this->getME["tpl"]->text("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
-	$this->getME["tpl"]->reset("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
-
-return $this->getME["errors"]["error"];
-unset($this->getME);
-}
-
-
-
-
-//====================================================	
-
-
-function getModulesContent($input){//функция выборки модулей из контента (возвращает список модулей )
-//В функцию передаем content, startTag, endTag
-//Возвращает массив listModules
-	$this->getMC["input"]=$input;
-	$this->getMC["input"]["startTag"]="{mod_";
-	$this->getMC["input"]["endTag"]="}";
-	$this->getMC["input"]["startString"] = explode($this->getMC["input"]["startTag"], $this->getMC["input"]["content"]);
-	unset($this->getMC["input"]["startString"][0]);//если до модуля есть текст, то просто его удаляем из обработки
-	if (isset($this->getMC["input"]["startString"][1])){//если найден хоть один модуль
-		foreach($this->getMC["input"]["startString"] as $this->getMC["input"]["startString"]["key"]=>$this->getMC["input"]["startString"]["value"]){
-			$this->getMC["input"]["endString"][] = explode($this->getMC["input"]["endTag"], $this->getMC["input"]["startString"][$this->getMC["input"]["startString"]["key"]]);
-		}
-		foreach($this->getMC["input"]["endString"] as $this->getMC["input"]["endString"]["key"]=>$this->getMC["input"]["endString"]["value"]){
-			//массив с именами модулей
-			$this->getMC["output"]["listModules"][]="mod_".$this->getMC["input"]["endString"]["value"][0];
-		}
-	}
-
-	//нужна проверка, если нет подключенных модулей (массив пустой), то не запускать initMC()
-return $this->getMC["output"];
-unset($this->getMC["output"]);
 }
 
 
@@ -204,6 +136,53 @@ function getListModules($input){//функция выборки модулей �
 return $this->getLM["output"];
 unset($this->getLM["output"]);
 }
+
+
+function parseURL($input){
+	$this->parseURL["input"]=$input;
+	$this->parseURL["str"]= explode("/", $this->parseURL["input"]["REQUEST_URI"]);
+	$this->parseURL["url"]["url_alt"]=substr(end($this->parseURL["str"]),0,strrpos(end($this->parseURL["str"]),"."));
+return $this->parseURL["url"];
+}
+
+function convertURL($input){
+	$this->convertURL["input"]=$input;
+	$this->query="SELECT * FROM urls WHERE url_alt='{$this->convertURL["input"]["url_alt"]}'";
+	$this->sql=mysql_query($this->query) or die(mysql_error());
+	$this->convertURL["row"]=mysql_fetch_array($this->sql);
+return $this->convertURL["row"];
+}
+
+
+function getModulesSetting($input){
+$this->gMS["input"]=$input;
+$this->gMS["tpl"] = new etcTemplate(MODULES.$this->gMS["input"]["modName"]."/".$this->gMS["input"]["modName"].'.template.tpl');
+	
+	$this->gMS["tpl"]->parse("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
+	$this->gMS["vars"]["varValue"]=$this->gMS["tpl"]->text("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
+	$this->gMS["tpl"]->reset("tpl.SETTING.".$this->gMS["input"]["var"]."_".$this->gMS["input"]["parametr"]);
+
+return $this->gMS["vars"]["varValue"];
+unset($this->gMS);
+}
+
+function getModulesError($input){
+$this->getME["input"]=$input;
+$this->getME["tpl"] = new etcTemplate(MODULES.$this->getME["input"]["modName"]."/".$this->getME["input"]["modName"].'.template.tpl');
+
+	$this->getME["tpl"]->parse("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
+	$this->getME["errors"]["error"]=$this->getME["tpl"]->text("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
+	$this->getME["tpl"]->reset("tpl.SETTING.error_".$this->getME["input"]["errorAlias"]);
+
+return $this->getME["errors"]["error"];
+unset($this->getME);
+}
+
+
+
+
+//====================================================	
+
 
 
 	
@@ -318,7 +297,11 @@ function CreatePage($input){
 		foreach($this->CreatePage["input"] as $this->key=>$this->_array){
 		//====проба escape  последовательности
 		if($this->key=="page_content"){
+			//надо чтобы пост запрос не резал ситемные знаки типа & кодируется в JS 
+			$this->CreatePage["input"][$this->key]["value"]=str_replace("(percentSign)","%",$this->CreatePage["input"][$this->key]["value"]);
+			//$this->CreatePage["input"][$this->key]["value"]=mysql_real_escape_string($this->CreatePage["input"][$this->key]["value"]); 
 			$this->CreatePage["input"][$this->key]["value"]=urldecode($this->CreatePage["input"][$this->key]["value"]);
+
 		}
 		//====
 		//$this->CreatePage["input"][$this->key]["value"]=preg_replace("/<p>&nbsp;<\/p>/","<br>",$this->CreatePage["input"][$this->key]["value"]);
@@ -436,7 +419,7 @@ function Cmd($input, $callback=array()){
 	$this->System["input"]=$input;
 	$this->System["callback"]=$callback;
 	foreach($this->System["callback"] as $this->callbackName){
-		$callback=$this->callbackName;
+		$callback=$this->callbackName;//иначе название калбека не читается
 		if($this->System["input"][$this->callbackName]=="NULL"){
 			$this->callbackOutput[$this->callbackName]=$this->$callback();
 			return $this->callbackOutput;
@@ -511,11 +494,21 @@ $this->ViewCategory["tpl"] = new etcTemplate('themes/administrator_default/admin
 		$this->ViewCategory["output"]["Category"]["acceptText"][]=$this->ViewCategory["tpl"]->text('tpl.category');
 		$this->ViewCategory["tpl"]->reset('tpl.category');
 		
+		
+
+		
 		//генерируем список страниц в директории.
 		$this->pageQuery="SELECT * FROM pages WHERE page_category_id='{$this->ViewCategory["row"]["id"]}'";
 		$this->pageSql=mysql_query($this->pageQuery) or die(mysql_error());
 		while($this->ViewCategory["pageRow"]=mysql_fetch_array($this->pageSql)){
 		//print_r($this->ViewCategory["pageRow"]);
+
+			if($this->ViewCategory["pageRow"]["page_index"]==1){
+				//добавление в массив вывода своей переменной
+				$this->ViewCategory["tpl"]->parse('tpl.MarkerIndex');
+				$this->ViewCategory["pageRow"]["markerIndex"]=$this->ViewCategory["tpl"]->text('tpl.MarkerIndex');
+			}else{$this->ViewCategory["pageRow"]["markerIndex"]="";}
+
 			//генерация отступов
 			$this->ViewCategory["pageTab"]="";
 			for($this->i=0; $this->i<$this->ViewCategory["row"]["dir"]+1; $this->i++){
@@ -531,6 +524,7 @@ $this->ViewCategory["tpl"] = new etcTemplate('themes/administrator_default/admin
 			'pageid'=>$this->ViewCategory["pageRow"]["page_id"],
 			'pagesort'=>$this->ViewCategory["pageRow"]["page_sort"],
 			'pageName'=>$this->ViewCategory["pageRow"]["page_name"],
+			'markerIndex'=>$this->ViewCategory["pageRow"]["markerIndex"],
 			'THEME'=>"administrator_default"
 			));
 			$this->ViewCategory["tpl"]->parse('tpl.ListPages');
@@ -771,7 +765,15 @@ function Authorization($input){
 return $this->Auth["output"];
 }
 
+function ViewCategorySelect($input){
+$this->ViewCategorySelect["input"]=$input;
+$this->ViewCategorySelect["tpl"] = new etcTemplate('themes/administrator_default/administrator.template.tpl');
+//генерируем список категорий для поля Select
+		$this->ViewCategorySelect["tpl"]->parse('tpl.optionSelectCategory');
+		$this->ViewCategorySelect["output"]["optionSelectCategory"].=$this->ViewCategory["tpl"]->text('tpl.optionSelectCategory');
+		$this->ViewCategorySelect["tpl"]->reset('tpl.optionSelectCategory');
 
+}
 
 
 

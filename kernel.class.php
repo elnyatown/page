@@ -39,11 +39,22 @@ function generateTIME(){return date("H:i:s");}//ЗАВЕРШЕНО
 //======================отображение для пользователя
 
 function initModules($input){
+print_r($input);
+
+
+
+
 	$this->initModules["tpl"] = new etcTemplate(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
 	
 	$this->initModules["getListModules"]["html"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
 	
 	$this->initModules["out"]["getListModules"]=$this->getListModules($this->initModules["getListModules"]);
+
+print_r($this->initModules["out"]["getListModules"]["Modules"]);
+
+$this->initModules["plus"]=array_merge_recursive($input,$this->initModules["out"]["getListModules"]["Modules"]);
+
+print_r($this->initModules["plus"]);
 
 	foreach($this->initModules["out"]["getListModules"]["arrayListModules"] as $this->initModules["nameModule"]){
 		$this->initModules["nameModule"]=trim($this->initModules["nameModule"]);
@@ -120,7 +131,12 @@ function getListModules($input){//функция выборки модулей �
 				$this->getLM["strParameters"]=explode(',',$this->getLM["tempStr"][1]);
 				foreach($this->getLM["strParameters"] as $this->getLM["strParameters"]["key"]=>$this->getLM["strParameters"]["value"]){
 					$this->getLM["parameter"]=explode('=',$this->getLM["strParameters"][$this->getLM["strParameters"]["key"]]);
-					$this->getLM["Modules"][$this->getLM["tempName"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
+
+$this->getLM["nameModule"]="mod_".$this->getLM["tempName"];
+
+$this->getLM["Modules"][$this->getLM["nameModule"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
+
+					//$this->getLM["Modules"][$this->getLM["tempName"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
 					//$this->getLM["Modules"][имяМодуля][имяПараметра]=значениеПараметра, зарезервированное имя параметра - modName
 				}
 			}
@@ -416,6 +432,7 @@ function MoveCategory($input){//временно заморожена
 }
 	
 function Cmd($input, $callback=array()){
+
 	$this->System["input"]=$input;
 	$this->System["callback"]=$callback;
 	foreach($this->System["callback"] as $this->callbackName){
@@ -424,11 +441,12 @@ function Cmd($input, $callback=array()){
 			$this->callbackOutput[$this->callbackName]=$this->$callback();
 			return $this->callbackOutput;
 		}else{
+
 			$this->callbackOutput[$this->callbackName]=$this->$callback($this->System["input"][$this->callbackName]);
 			return $this->callbackOutput;
 		}
 	}
-	
+
 } 
 	
 function ViewCategory($input){

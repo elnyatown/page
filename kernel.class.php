@@ -69,7 +69,7 @@ $this->initModules["getListModules"]["megreModules"]=array_merge_recursive($inpu
 		}
 //если есть то меняем nameModule на значение по ключу
 
-
+//var_dump($this->initModules["nameModuleTpl"]);
 		$this->initModules["assign"][$this->initModules["nameModuleTpl"]]=$callback($input[$this->initModules["nameModule"]]); 
  
 	}
@@ -92,14 +92,28 @@ function initModulesContent($input){
 				$this->initMC["name"]=trim($this->initMC["name"]);
 				include_once(DOCUMENT_ROOT."/modules/".$this->initMC["name"]."/".$this->initMC["name"].".php");//подключаем исполняемый файл модуля
 				$callback=$this->initMC["name"];
+//var_dump($this->initMC["input"]["arrayListModulesTpl"]);
+				if(array_key_exists($this->initMC["name"],$this->initMC["input"]["arrayListModulesTpl"])){
+					$this->initMC["nameModuleTpl"]=$this->initMC["input"]["arrayListModulesTpl"][$this->initMC["name"]];
+				}else{
+					$this->initMC["nameModuleTpl"]=$this->initMC["nameModule"];
+				}
+
+
 				//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
-				$this->initMC["assign"][$this->initMC["name"]]=$callback(); //параметры модуля в функцию не передаем, так как пока не можем их вписать в котент
-			}
+				//$this->initMC["assign"][$this->initMC["name"]]=$callback(); //параметры модуля в функцию не передаем, так как пока не можем их вписать в котент
+				$this->initMC["assign"][$this->initMC["nameModuleTpl"]]=$callback();
+			}	
 		}else{//если запись в файл прошла неуспешно, то надо по шаблонам вывести стандартное предупреждение
 			foreach($this->initMC["input"]["arrayListModules"] as $this->initMC["name"]){
 				$this->initMC["name"]=trim($this->initMC["name"]);
+				if(array_key_exists($this->initMC["name"],$this->initMC["input"]["arrayListModulesTpl"])){
+					$this->initMC["nameModuleTpl"]=$this->initMC["input"]["arrayListModulesTpl"][$this->initMC["name"]];
+				}else{
+					$this->initMC["nameModuleTpl"]=$this->initMC["nameModule"];
+				}
 				//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
-				$this->initMC["assign"][$this->initMC["name"]]="ОШИБКА ПРИ СОЗДАНИИ ВРЕМЕННОГО ФАЙЛА ШАБЛОНА"; //параметры в функцию не передаем, так как пока не можем их вписать в котент
+				$this->initMC["assign"][$this->initMC["nameModuleTpl"]]="ОШИБКА ПРИ СОЗДАНИИ ВРЕМЕННОГО ФАЙЛА ШАБЛОНА"; //параметры в функцию не передаем, так как пока не можем их вписать в котент
 			}
 		}
 		$this->initMC["tpl"] = new etcTemplate(TEMP.$this->initMC["timestamp"].'.tmp');
@@ -128,21 +142,20 @@ function getListModules($input){//функция выборки модулей �
 //{mod_menu}
 //Возвращает arrayListModules, Modules[имяМодуля][параметр]=значение
 	$this->getLM["input"]=$input;
-	$this->getLM["input"]["startTag"]="{mod_";
-	$this->getLM["input"]["prefix"]="mod_";
-	$this->getLM["input"]["endTag"]="}";
-	$this->getLM["startString"] = explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
-//$this->ss=explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
+	$this->getLM["input"]["startTag"]='{mod_';
+	$this->getLM["input"]["prefix"]='mod_';
+	$this->getLM["input"]["endTag"]='}';
+	$this->getLM["startString"]=explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
 	unset($this->getLM["startString"][0]);//если до модуля есть текст, то просто его удаляем из обработки
-//unset($this->ss[0]);
-//var_dump($this->ss);
-	//$this->getLM["startString"][0]="deleted";
-//var_dump($this->getLM["startString"]);
+
+	$this->getLM["startString"]=array_diff($this->getLM["startString"], array(''));
+//$this->test=array();
+//unset($this->test);
+//var_dump($this->test);
+var_dump($this->getLM["startString"]);
 	if (isset($this->getLM["startString"][1])){//если найден хоть один модуль
 		foreach($this->getLM["startString"] as $this->getLM["startString"]["value"]){
-			if($this->getLM["startString"]["value"]!="deleted"){
 				$this->getLM["endString"][] = explode($this->getLM["input"]["endTag"], $this->getLM["startString"]["value"]);
-			}	
 		}
 		unset($this->getLM["endString"][1]);
 //var_dump($this->getLM["endString"]);
@@ -180,6 +193,7 @@ function getListModules($input){//функция выборки модулей �
 //var_dump(array_keys($this->getLM["Modules"]));
 //имя модуля в tpl изменилось в assign в initModules()  должно быть с параметрами
 		//unset($this->getLM["nameModule"]);
+
 		foreach($this->getLM["Modules"] as $this->getLM["nameModule"] => $this->getLM["arrayVarModule"]){
 			$this->getLM["strNameModuleTpl"]=$this->getLM["nameModule"].":";
 			foreach($this->getLM["arrayVarModule"] as $this->getLM["varModule"]=>$this->getLM["varModuleValue"]){

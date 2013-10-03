@@ -10,7 +10,7 @@ $input["html"]=file_get_contents("global.template.tpl");
 $out=$test->getListModules($input);
 
 
-print_r($out["arrayListModulesTpl"]);
+//print_r($out["arrayListModulesTpl"]);
 
 
 
@@ -26,94 +26,59 @@ print_r($out["arrayListModulesTpl"]);
 
 
 <!DOCTYPE HTML PUBLIC  "-//W3C//DTD HTML 4.01//EN" "www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
   <head>
-  <meta charset="utf-8">
-    <title>Шаблон Bootstrap 101</title>
-    <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-	<link href="bootstrap/css/bootstrap-responsive.css">
-	<script src="jq.js"></script>
-    
+    <title>Bootstrap 101 Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap 
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">-->
 	
-	<script src="/bootstrap/js/bootstrap.js"></script>
-
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
+	    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed 
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/js/bootstrap.min.js"></script>-->
+<script src="bootstrap/js/bootstrap.js"></script>
+    <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) 
+    <script src="bootstrap/js/respond.js"></script>-->
+	
   </head>
- <body>
-
-
- 
-<!--
+  <body>
   <div class="container">
-<div class="row">
-  <div class="navbar navbar-static-top ">
- <ul class="nav">
-  <li class="active">
-    <a href="#">Домой</a>
+  <div class="row">
+  <ul class="nav nav-pills">
+  <li class="active"><a href="#">Home</a></li>
+  <li><a href="#">Profile</a></li>
+  <li><a href="#">Messages</a></li>
+</ul>
+  </div>
+  
+  <div class="row">
+  <div class="col-md-9">10</div>
+  <div class="col-md-3">2
+  <ul class="nav nav-pills nav-stacked">
+	<li class="active"><a href="#">Home</a></li>
+	<li><a href="#">Profile</a></li>
+	<li><a href="#">Messages</a></li>
+	<li class="dropdown">
+		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+			Dropdown <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="#">Profile</a></li>
+			<li><a href="#">Messages ert  ert er t 3q4t qretertewrt wert wer tewr t</a></li>
+		</ul>
   </li>
-  <li class="divider-vertical"></li>
-  <li><a href="#">Link</a></li>
-  <li class="divider-vertical"></li>
-  <li><a href="#">Link</a></li>
+  
+  
+  
+  
 </ul>
+  </div>
 </div>
 
-</div>
-  
-  
- <div class="row">
-  <div class="span6">.xcvbx 88888 88888 8888 8888 cvb. kujhg k hlkhfdl hvk lkhwe kejh ljwerlkjehr jkerh lkjke hvkljehkljvh jhwer lkewhjk hlkjhwe v.</div>
-  <div class="span4 offset2">.
-  
-  <form class="form-horizontal">
-  <div class="control-group">
-    <label class="control-label" for="inputEmail">Email</label>
-    <div class="controls">
-      <input type="text" id="inputEmail" placeholder="Email">
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="inputPassword">Password</label>
-    <div class="controls">
-      <input type="password" id="inputPassword" placeholder="Password">
-    </div>
-  </div>
-  <div class="control-group">
-    <div class="controls">
-      <label class="checkbox">
-        <input type="checkbox"> Remember me
-      </label>
-      <button type="submit" class="btn">Sign in</button>
-    </div>
-  </div>
-</form>
-</div>
-</div>
-	
-<div class="row">
-  <div class="span12">
-  
-  <div class="dropdown">
-<a class="dropdown-toggle" data-toggle="dropdown" data-target="#" href="#">Dropdown trigger</a>
-  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-  <li><a tabindex="-1" href="#">Действие</a></li>
-  <li><a tabindex="-1" href="#">Другое действие</a></li>
-  <li><a tabindex="-1" href="#"></a></li>
-  <li class="divider"></li>
-  <li><a tabindex="-1" href="#">Отделенный пункт</a></li>
-</ul>
-</div>
-  </div>
-  
-  
 
-
-  
 </div>
-	
-	
-	
-	</div>
--->
-	</body>
-<html>
+  </body>
+</html>

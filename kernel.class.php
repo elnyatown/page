@@ -39,29 +39,38 @@ function generateTIME(){return date("H:i:s");}//ЗАВЕРШЕНО
 //======================отображение для пользователя
 
 function initModules($input){
-print_r($input);
-
-
-
+//print_r($input);
 
 	$this->initModules["tpl"] = new etcTemplate(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
 	
-	$this->initModules["getListModules"]["html"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
+	$this->initModules["in"]["getListModules"]["html"]=file_get_contents(DOCUMENT_ROOT.'/themes/'.THEME.'/global.template.tpl');
 	
-	$this->initModules["out"]["getListModules"]=$this->getListModules($this->initModules["getListModules"]);
+	$this->initModules["out"]["getListModules"]=$this->getListModules($this->initModules["in"]["getListModules"]);
 
-print_r($this->initModules["out"]["getListModules"]["Modules"]);
+//print_r($this->initModules["out"]["getListModules"]["Modules"]);
 
-$this->initModules["plus"]=array_merge_recursive($input,$this->initModules["out"]["getListModules"]["Modules"]);
+$this->initModules["getListModules"]["megreModules"]=array_merge_recursive($input,$this->initModules["out"]["getListModules"]["Modules"]);//сливаем массивы параметров из index и  tpl
 
-print_r($this->initModules["plus"]);
+//$this->initModules["reverse"]["arrayListModulesTpl"]=array_flip($this->initModules["out"]["getListModules"]["arrayListModulesTpl"]);
+//print_r($this->initModules["reverse"]);
+//print_r($this->initModules["out"]["getListModules"]["arrayListModulesTpl"]);
 
 	foreach($this->initModules["out"]["getListModules"]["arrayListModules"] as $this->initModules["nameModule"]){
 		$this->initModules["nameModule"]=trim($this->initModules["nameModule"]);
 		include_once(DOCUMENT_ROOT."/modules/".$this->initModules["nameModule"]."/".$this->initModules["nameModule"].".php");//подключаем исполняемый файл модуля
 		$callback=$this->initModules["nameModule"];
 		//выполняем основную функцию из файла модуля, и генерируем массив для шаблона
-		$this->initModules["assign"][$this->initModules["nameModule"]]=$callback($input[$this->initModules["nameModule"]]); 
+//надо прогнать массив всех модулей
+//проверяем есть ли ключ nameModule в массиве arrayListModulesTpl
+		if(array_key_exists($this->initModules["nameModule"],$this->initModules["out"]["getListModules"]["arrayListModulesTpl"])){
+			$this->initModules["nameModuleTpl"]=$this->initModules["out"]["getListModules"]["arrayListModulesTpl"][$this->initModules["nameModule"]];
+		}else{
+			$this->initModules["nameModuleTpl"]=$this->initModules["nameModule"];
+		}
+//если есть то меняем nameModule на значение по ключу
+
+
+		$this->initModules["assign"][$this->initModules["nameModuleTpl"]]=$callback($input[$this->initModules["nameModule"]]); 
  
 	}
 return $this->initModules["assign"];
@@ -108,40 +117,58 @@ return $this->initMC["output"];
 }
 
 
+
 function getListModules($input){//функция выборки модулей из контента (возвращает список модулей )
 //В функцию передаем html, startTag, endTag
-//{mod_menu:var1=test1,var2=test2}
+//dsfgsfg{mod_menu:var1=test1,var2=test2}dfsggssf{mod_menu:var1=test1,var2=test2}cvnbcnhyn
+//menu:var1=test1,var2=test2}dfsggssf
+//menu:var1=test1,var2=test2}cvnbcnhyn
+
+
 //{mod_menu}
 //Возвращает arrayListModules, Modules[имяМодуля][параметр]=значение
 	$this->getLM["input"]=$input;
 	$this->getLM["input"]["startTag"]="{mod_";
+	$this->getLM["input"]["prefix"]="mod_";
 	$this->getLM["input"]["endTag"]="}";
 	$this->getLM["startString"] = explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
+//$this->ss=explode($this->getLM["input"]["startTag"], $this->getLM["input"]["html"]);
 	unset($this->getLM["startString"][0]);//если до модуля есть текст, то просто его удаляем из обработки
+//unset($this->ss[0]);
+//var_dump($this->ss);
+	//$this->getLM["startString"][0]="deleted";
+//var_dump($this->getLM["startString"]);
 	if (isset($this->getLM["startString"][1])){//если найден хоть один модуль
-		foreach($this->getLM["startString"] as $this->getLM["startString"]["key"]=>$this->getLM["startString"]["value"]){
-			$this->getLM["endString"][] = explode($this->getLM["input"]["endTag"], $this->getLM["startString"][$this->getLM["startString"]["key"]]);
+		foreach($this->getLM["startString"] as $this->getLM["startString"]["value"]){
+			if($this->getLM["startString"]["value"]!="deleted"){
+				$this->getLM["endString"][] = explode($this->getLM["input"]["endTag"], $this->getLM["startString"]["value"]);
+			}	
 		}
+		unset($this->getLM["endString"][1]);
+//var_dump($this->getLM["endString"]);
 		foreach($this->getLM["endString"] as $this->getLM["endString"]["key"]=>$this->getLM["endString"]["value"]){
 			//разбиваем чтобы найти параметры
 			$this->getLM["tempStr"]=explode(':',$this->getLM["endString"]["value"][0]);
+//var_dump($this->getLM["tempStr"]);
+
 			$this->getLM["tempName"]=$this->getLM["tempStr"][0];//имя модуля берем мез префикса mod_
+
 			//$this->getLM["Modules"][$this->getLM["tempName"]]["modName"]=$this->getLM["tempName"];
 			if(isset($this->getLM["tempStr"][1])){
 				$this->getLM["strParameters"]=explode(',',$this->getLM["tempStr"][1]);
+//var_dump($this->getLM["strParameters"]);
 				foreach($this->getLM["strParameters"] as $this->getLM["strParameters"]["key"]=>$this->getLM["strParameters"]["value"]){
-					$this->getLM["parameter"]=explode('=',$this->getLM["strParameters"][$this->getLM["strParameters"]["key"]]);
+					$this->getLM["parameter"]=explode('=',$this->getLM["strParameters"]["value"]);
+//var_dump($this->getLM["tempName"]);
+//var_dump($this->getLM["nameModule"]);
+					$this->getLM["nameModule"]=$this->getLM["input"]["prefix"].$this->getLM["tempName"];//имя модуля берем с префиксом чтоб везде совпадало
+					$this->getLM["Modules"][$this->getLM["nameModule"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
 
-$this->getLM["nameModule"]="mod_".$this->getLM["tempName"];
-
-$this->getLM["Modules"][$this->getLM["nameModule"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
-
-					//$this->getLM["Modules"][$this->getLM["tempName"]][$this->getLM["parameter"][0]]=$this->getLM["parameter"][1];
 					//$this->getLM["Modules"][имяМодуля][имяПараметра]=значениеПараметра, зарезервированное имя параметра - modName
 				}
 			}
 			//массив с именами модулей
-			$this->getLM["output"]["arrayListModules"][]="mod_".$this->getLM["tempName"];
+			$this->getLM["output"]["arrayListModules"][]=$this->getLM["input"]["prefix"].$this->getLM["tempName"];
 		}
 		$this->getLM["output"]["Modules"]=$this->getLM["Modules"];
 	}else{
@@ -149,6 +176,22 @@ $this->getLM["Modules"][$this->getLM["nameModule"]][$this->getLM["parameter"][0]
 		$this->getLM["output"]["arrayListModules"]="empty";
 		$this->getLM["output"]["Modules"]="empty";
 	}
+
+//var_dump(array_keys($this->getLM["Modules"]));
+//имя модуля в tpl изменилось в assign в initModules()  должно быть с параметрами
+		//unset($this->getLM["nameModule"]);
+		foreach($this->getLM["Modules"] as $this->getLM["nameModule"] => $this->getLM["arrayVarModule"]){
+			$this->getLM["strNameModuleTpl"]=$this->getLM["nameModule"].":";
+			foreach($this->getLM["arrayVarModule"] as $this->getLM["varModule"]=>$this->getLM["varModuleValue"]){
+				//генерируем правильное имя для tpl
+				$this->getLM["strNameModuleTpl"].=$this->getLM["varModule"]."=".$this->getLM["varModuleValue"].",";
+			}
+			$this->getLM["output"]["arrayListModulesTpl"][$this->getLM["nameModule"]]=substr($this->getLM["strNameModuleTpl"], 0, strlen($this->getLM["strNameModuleTpl"])-1);
+		}
+//print_r($this->getLM["output"]["arrayListModulesTpl"]);
+
+
+
 return $this->getLM["output"];
 unset($this->getLM["output"]);
 }

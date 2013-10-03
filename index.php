@@ -1,3 +1,29 @@
+<?php
+date_default_timezone_set( 'Europe/Moscow' );
+
+
+include("kernel.class.php");
+$test=new kernel();
+$input["html"]=file_get_contents("global.template.tpl");
+//$input["html"]="sdfghf  dfghdj {mod_mainmenu}  ghjfghjfg fghjfghj g  {mod_content:var1=TEST1,var2=TEST2} ehjhf ekjhf{mod_submenu:g1=D1,g2=D2} ekjrhf";
+//var_dump($input["html"]);
+$out=$test->getListModules($input);
+
+
+print_r($out["arrayListModulesTpl"]);
+
+
+
+
+
+
+
+
+//echo("test");
+?>
+
+
+
 
 <!DOCTYPE HTML PUBLIC  "-//W3C//DTD HTML 4.01//EN" "www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -17,40 +43,7 @@
 
 
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-
-
+<!--
   <div class="container">
 <div class="row">
   <div class="navbar navbar-static-top ">
@@ -121,5 +114,6 @@
 	
 	
 	</div>
+-->
 	</body>
 <html>

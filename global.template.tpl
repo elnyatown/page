@@ -66,9 +66,9 @@
 		<!-- Left column -->
 		<div class="column-left">
 			<div class="column-left-in">
-				{mod_content:var1=TEST1,var2=TEST2}
+				{mod_content:var1=TEST1,var2=test2}
 
-				{mod_lastnews:LV1=G1,LV2=G2}
+				{mod_lastnews}
 			</div>
 		</div> <!-- Left column end -->
 
@@ -97,7 +97,7 @@
 
 <hr class="noscreen" />
 
-	
+	{test_mod:var1=t1,var2=t2}
 </div> <!-- Wrapper end -->
 </body>
 

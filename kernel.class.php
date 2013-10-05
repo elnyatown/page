@@ -87,7 +87,7 @@ function initModulesContent($input){
 	if(count($this->initMC["input"]["arrayListModules"])!=0 AND $this->initMC["input"]["arrayListModules"]!="empty"){
 		if($this->initMC["tmpFile"]){//если запись файла прошла успешно
 			//инициализируем модули
-var_dump($this->initMC["input"]["arrayListModulesTpl"]);
+//var_dump($this->initMC["input"]["arrayListModulesTpl"]);
 			foreach($this->initMC["input"]["arrayListModules"] as $this->initMC["nameModule"]){
 				$this->initMC["nameModule"]=trim($this->initMC["nameModule"]);
 				include_once(DOCUMENT_ROOT."/modules/".$this->initMC["nameModule"]."/".$this->initMC["nameModule"].".php");//подключаем исполняемый файл модуля
@@ -161,7 +161,7 @@ function getListModules($input){//функция выборки модулей �
 
 			$this->getLM["tempName"]=$this->getLM["tempStr"][0];//имя модуля берем мез префикса mod_
 
-var_dump($this->getLM["tempStr"][1]);
+//var_dump($this->getLM["tempStr"][1]);
 			if(isset($this->getLM["tempStr"][1])){//если есть хоть один параметр
 				$this->getLM["strParameters"]=explode(',',$this->getLM["tempStr"][1]);
 
@@ -173,11 +173,16 @@ var_dump($this->getLM["tempStr"][1]);
 
 					//$this->getLM["Modules"][имяМодуля][имяПараметра]=значениеПараметра, зарезервированное имя параметра - modName
 				}
-			}//else{$this->getLM["Modules"]="empty";}
+			}
 //var_dump($this->getLM["Modules"]);
 			//массив с именами модулей
 			$this->getLM["output"]["arrayListModules"][]=$this->getLM["input"]["prefix"].$this->getLM["tempName"];
 		}
+
+		if(!isset($this->getLM["Modules"])){
+			$this->getLM["Modules"]="empty";
+		}
+
 		if(isset($this->getLM["Modules"]) AND $this->getLM["Modules"]!="empty"){
 			foreach((array)$this->getLM["Modules"] as $this->getLM["nameModule"] => $this->getLM["arrayVarModule"]){
 				$this->getLM["strNameModuleTpl"]=$this->getLM["nameModule"].":";

@@ -31,8 +31,8 @@
 </div>
 
 
-<div class="col-md-7 col-sm-7">
-  <ul class="nav nav-pills">
+<div class="col-md-7 col-sm-7 ">
+  <ul class="nav nav-pills pull-right">
   <li class="active"><a href="#">Home</a></li>
   <li><a href="#">Profile</a></li>
   <li><a href="#">Messages</a></li>

@@ -13,7 +13,7 @@ define('URL',						"http://page.elnyatown.ru");
 class Kernel{
 
 //define('DOCUMENT_ROOT',		$_SERVER["DOCUMENT_ROOT"]);
-//
+//test
 
 
 function __construct(){//ЗАВЕРШЕНО

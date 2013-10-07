@@ -3,6 +3,7 @@
 <html>
   <head>
     <title>Bootstrap 101 Template</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-wip/css/bootstrap.min.css">-->
@@ -31,8 +32,8 @@
 </div>
 
 
-<div class="col-md-7 col-sm-7">
-  <ul class="nav nav-pills">
+<div class="col-md-7 col-sm-7 ">
+  <ul class="nav nav-pills pull-right">
   <li class="active"><a href="#">Home</a></li>
   <li><a href="#">Profile</a></li>
   <li><a href="#">Messages</a></li>

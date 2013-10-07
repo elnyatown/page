@@ -358,6 +358,12 @@ function CreatePage($input){
 		$this->CreatePage["query"]["TABLE"]="pages";
 		$this->CreatePage["query"]["page_id"]=$this->CreatePage["input"]["reWritePageId"];
 		
+		$this->ReWriteMarkerIndex["input"]["page_id"]=$this->CreatePage["input"]["reWritePageId"];
+
+		$this->ReWriteMarkerIndex($this->ReWriteMarkerIndex["input"]);
+
+
+
 		unset($this->CreatePage["input"]["reWritePageId"]);
 		unset($this->CreatePage["input"]["parentCategoryId"]);
 		unset($this->CreatePage["input"]["action"]);
@@ -387,7 +393,10 @@ function CreatePage($input){
 		$this->CreatePage["query"]["SET"]=" url_alt='{$this->CreatePage["input"]["page_alt"]["value"]}', url_id='{$this->CreatePage["query"]["page_id"]}'";
 		$this->query="UPDATE {$this->CreatePage["query"]["TABLE"]} SET {$this->CreatePage["query"]["SET"]} WHERE url_id='{$this->CreatePage["query"]["page_id"]}'";
 		mysql_query($this->query) or die(mysql_error());
+	
 		
+
+
 	}else{
 		//$this->CreatePage["input"]["id_big"]["value"]=$this->generateXesh();
 		$this->CreatePage["input"]["page_category_id"]["value"]=$this->CreatePage["input"]["parentCategoryId"];
@@ -425,6 +434,24 @@ function CreatePage($input){
 	
 	
 }
+
+
+function ReWriteMarkerIndex($input){
+//update чтобы индексный файл в категории был только один
+//если созданной или измененной странице присваевается индекс, то
+//находим старую индексную страницу с маркером индекса и удаляем его.
+	$this->ReWriteMarkerIndex["input"]=$input;
+	$this->query="SELECT page_category_id FROM pages WHERE page_id='{$this->ReWriteMarkerIndex["input"]["page_id"]}'";
+
+	$mysql_query=mysql_query($this->query) or die(mysql_error());
+	while($this->ReWriteMarkerIndex["row"]=mysql_fetch_array($mysql_query)){
+		$this->query="UPDATE pages SET page_index='0' WHERE page_index='1' AND  page_category_id='{$this->ReWriteMarkerIndex["row"]["page_category_id"]}'";
+		mysql_query($this->query) or die(mysql_error());
+	}
+
+}
+
+
 	
 function ReWritePage($input){
 $this->ReWritePage["input"]=$input;

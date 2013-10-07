@@ -358,6 +358,13 @@ function CreatePage($input){
 		$this->CreatePage["query"]["TABLE"]="pages";
 		$this->CreatePage["query"]["page_id"]=$this->CreatePage["input"]["reWritePageId"];
 		
+		$this->ReWriteMarkerIndex["input"]["page_id"]=$this->CreatePage["input"]["reWritePageId"];
+		$this->ReWriteMarkerIndex["input"]["page_category_id"]=$this->CreatePage["input"]["parentCategoryId"];
+		$this->ReWriteMarkerIndex["input"]["page_index"]=$this->CreatePage["input"]["page_index"];
+		$this->ReWriteMarkerIndex($this->ReWriteMarkerIndex["input"]);
+
+
+
 		unset($this->CreatePage["input"]["reWritePageId"]);
 		unset($this->CreatePage["input"]["parentCategoryId"]);
 		unset($this->CreatePage["input"]["action"]);
@@ -387,7 +394,10 @@ function CreatePage($input){
 		$this->CreatePage["query"]["SET"]=" url_alt='{$this->CreatePage["input"]["page_alt"]["value"]}', url_id='{$this->CreatePage["query"]["page_id"]}'";
 		$this->query="UPDATE {$this->CreatePage["query"]["TABLE"]} SET {$this->CreatePage["query"]["SET"]} WHERE url_id='{$this->CreatePage["query"]["page_id"]}'";
 		mysql_query($this->query) or die(mysql_error());
+	
 		
+
+
 	}else{
 		//$this->CreatePage["input"]["id_big"]["value"]=$this->generateXesh();
 		$this->CreatePage["input"]["page_category_id"]["value"]=$this->CreatePage["input"]["parentCategoryId"];
@@ -398,7 +408,12 @@ function CreatePage($input){
 		//$this->CreatePage["input"]["whos_write"]["value"]="test user";
 		//$this->CreatePage["input"]["permission"]["value"]=0000;
 		$this->CreatePage["query"]["TABLE"]="pages";
-	
+		
+		$this->ReWriteMarkerIndex["input"]["page_id"]=$this->CreatePage["input"]["reWritePageId"];
+		$this->ReWriteMarkerIndex["input"]["page_category_id"]=$this->CreatePage["input"]["parentCategoryId"];
+		$this->ReWriteMarkerIndex["input"]["page_index"]=$this->CreatePage["input"]["page_index"];
+		$this->ReWriteMarkerIndex($this->ReWriteMarkerIndex["input"]);
+
 		unset($this->CreatePage["input"]["reWritePageId"]);
 		unset($this->CreatePage["input"]["parentCategoryId"]);
 		unset($this->CreatePage["input"]["action"]);
@@ -407,6 +422,18 @@ function CreatePage($input){
 		$this->CreatePage["query"]["INTO"]="";
 		$this->CreatePage["query"]["VALUES"]="";
 		foreach($this->CreatePage["input"] as $this->key=>$this->_array){
+
+		//====проба escape  последовательности
+		if($this->key=="page_content"){
+			//надо чтобы пост запрос не резал ситемные знаки типа & кодируется в JS 
+			$this->CreatePage["input"][$this->key]["value"]=str_replace("(percentSign)","%",$this->CreatePage["input"][$this->key]["value"]);
+			//$this->CreatePage["input"][$this->key]["value"]=mysql_real_escape_string($this->CreatePage["input"][$this->key]["value"]); 
+			$this->CreatePage["input"][$this->key]["value"]=urldecode($this->CreatePage["input"][$this->key]["value"]);
+		}
+		//====
+
+
+
 			$this->CreatePage["query"]["INTO"]=$this->CreatePage["query"]["INTO"].$this->key." , ";
 			$this->CreatePage["query"]["VALUES"]=$this->CreatePage["query"]["VALUES"]." '".$this->CreatePage["input"][$this->key]["value"]."' , ";
 		}
@@ -425,6 +452,31 @@ function CreatePage($input){
 	
 	
 }
+
+
+function ReWriteMarkerIndex($input){
+//update чтобы индексный файл в категории был только один
+//если созданной или измененной странице присваевается индекс, то
+//находим старую индексную страницу с маркером индекса и удаляем его.
+//print_r($this->ReWriteMarkerIndex["input"]["page_index"]);
+	if($this->ReWriteMarkerIndex["input"]["page_index"]["value"]==1){
+		if($this->ReWriteMarkerIndex["input"]["page_id"]!="empty"){
+			$this->ReWriteMarkerIndex["input"]=$input;
+			$this->query="SELECT page_category_id FROM pages WHERE page_id='{$this->ReWriteMarkerIndex["input"]["page_id"]}'";
+			$mysql_query=mysql_query($this->query) or die(mysql_error());
+			while($this->ReWriteMarkerIndex["row"]=mysql_fetch_array($mysql_query)){
+				$this->query="UPDATE pages SET page_index='0' WHERE page_index='1' AND  page_category_id='{$this->ReWriteMarkerIndex["row"]["page_category_id"]}'";
+				mysql_query($this->query) or die(mysql_error());
+			}
+		}else{
+			$this->query="UPDATE pages SET page_index='0' WHERE page_index='1' AND  page_category_id='{$this->ReWriteMarkerIndex["input"]["page_category_id"]}'";
+			mysql_query($this->query) or die(mysql_error());
+		}
+	}
+
+}
+
+
 	
 function ReWritePage($input){
 $this->ReWritePage["input"]=$input;
@@ -455,7 +507,6 @@ return $this->SortPage["output"];
 	
 function DeletePage($input){
 	$this->DeletePage["input"]=$input;
-	//удалили выбранную категорию
 	$this->query="DELETE  FROM pages WHERE page_id='{$this->DeletePage["input"]["pageid"]}'";
 	mysql_query($this->query) or die(mysql_error());
 }
